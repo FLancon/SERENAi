@@ -25,7 +25,7 @@ export class PropertiesApi {
    */
   async get(id: number): Promise<ApiResponse<Property>> {
     try {
-      const { data } = await this.axios.get(`/properties/${id}`);
+      const { data } = await this.axios.get(`/properties?id=${id}`);
       return data;
     } catch (error) {
       throw this.handleError(error);

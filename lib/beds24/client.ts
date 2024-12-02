@@ -38,7 +38,7 @@ export class Beds24Client {
       baseURL: this.config.baseURL,
       timeout: this.config.timeout,
       headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
+        'token': this.config.apiKey,
         'Accept': this.config.format === 'json' ? 'application/json' : 'application/xml',
         'Content-Type': 'application/json'
       }

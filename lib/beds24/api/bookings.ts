@@ -25,7 +25,7 @@ export class BookingsApi {
    */
   async get(id: number): Promise<ApiResponse<Booking>> {
     try {
-      const { data } = await this.axios.get(`/bookings/${id}`);
+      const { data } = await this.axios.get(`/bookings?id=${id}`);
       return data;
     } catch (error) {
       throw this.handleError(error);
