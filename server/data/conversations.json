@@ -1,0 +1,15 @@
+{
+  "conversations": [
+    {
+      "id": 3,
+      "guest": "Claire Dubois",
+      "apiSourceId": 19,
+      "online": true,
+      "lastMessage": "Fournissez-vous des équipements pour bébé ?",
+      "lastMessageTime": "4h ago",
+      "messages": [
+        { "id": 1, "content": "Fournissez-vous des équipements pour bébé comme un lit bébé ? Nous voyageons avec notre bébé de 6 mois.", "time": "12:45 PM", "isGuest": true }
+      ]
+    }
+  ]
+}
