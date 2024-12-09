@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     token: process.env.BEDS24_TOKEN,
     public: {
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY
     },
   },
   app: {
