@@ -7,7 +7,6 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     const client = new Beds24Client({ token: config.token });
     const body = await readBody(event);
-    console.log('body:', body)
 
     // // Validate request payload
     // validateMessagePayload(body);

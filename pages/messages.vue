@@ -210,6 +210,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { useMessages } from "~/composables/useMessages";
+import { useAI } from "~/composables/useAI";
 
 const {
   conversations,
@@ -221,6 +222,8 @@ const {
   selectConversation,
   sendMessage,
 } = useMessages();
+
+const { generateResponse, incomingChat } = useAI();
 
 const searchQuery = ref("");
 const newMessage = ref("");
@@ -294,8 +297,16 @@ const handleSendMessage = async () => {
 
   isSending.value = true;
   try {
-    await sendMessage(newMessage.value);
-    newMessage.value = "";
+    // FILTRE POUR NE MARCHER QUE SUR MA RESERVATION
+    if ((selectedConversation.value.bookingId = 63311557)) {
+      console.log("triggered");
+
+      const AiResponse = await incomingChat(selectedConversation);
+
+      console.log("Generated response:", AiResponse);
+      newMessage.value = AiResponse;
+      await sendMessage(newMessage.value);
+    }
   } catch (e) {
     // Error is already handled in useMessages
   } finally {

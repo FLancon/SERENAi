@@ -100,7 +100,7 @@ export const useMessages = () => {
       const response2 = await fetch("/api/bookings");
       const bookingInfo = await response2.json();
 
-      //Need to fetch Property List & Property Details
+      //Fetch Property List & Property Details
       const response3 = await fetch("/api/properties");
       const propertyInfo = await response3.json();
 
@@ -120,13 +120,11 @@ export const useMessages = () => {
         }
       });
 
+      // Sort Conversations by lastMessageTime
       conversations.value.sort((a, b) => {
         return new Date(b.lastMessageTime) - new Date(a.lastMessageTime);
       });
 
-      console.log(conversations.value);
-
-      //Need to reorder conversation by lastMessageTime
     } catch (e) {
       console.error("Error fetching messages:", e);
       error.value = "Failed to load messages";
