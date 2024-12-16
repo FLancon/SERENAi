@@ -1,6 +1,6 @@
 <template>
   <ClientOnly>
-    <div class="h-[calc(100vh-2rem)] flex mt-2">
+    <div class="h-[calc(100vh-4rem)] flex mt-2">
       <!-- Conversations List -->
       <div class="w-96 glass rounded-l-xl flex flex-col h-full">
         <!-- Search Bar -->
@@ -50,17 +50,23 @@
               <div class="flex justify-between items-start">
                 <div class="flex items-center gap-2">
                   <h3 class="font-medium text-white">
-                    {{ conversation.guest }}
+                    {{ capitalize(conversation.bookingDetails.firstName) }}
+                    {{ capitalize(conversation.bookingDetails.lastName) }}
                   </h3>
-                  <span 
+
+                  <span
                     class="px-2 py-0.5 text-xs rounded-full text-white"
-                    :class="conversation.apiSourceId === 19 ? 'bg-blue-500/50' : 'bg-red-500/50'"
+                    :class="
+                      conversation.apiSourceId === 19
+                        ? 'bg-blue-500/50'
+                        : 'bg-red-500/50'
+                    "
                   >
                     {{ getSourceLabel(conversation.apiSourceId) }}
                   </span>
                 </div>
                 <span class="text-xs text-white/50">{{
-                  conversation.lastMessageTime
+                  conversation.lastMessageTimeDistance
                 }}</span>
               </div>
               <p class="text-sm text-white/70 truncate mt-0.5">
@@ -78,17 +84,61 @@
           <div class="p-3 border-b border-white/10">
             <div class="flex items-center gap-2">
               <h2 class="font-medium text-white">
-                {{ selectedConversation.guest }}
+                {{ capitalize(selectedConversation.bookingDetails.firstName) }}
+                {{ capitalize(selectedConversation.bookingDetails.lastName) }}
               </h2>
-              <span 
+              <span
                 class="px-2 py-0.5 text-xs rounded-full text-white"
-                :class="selectedConversation.apiSourceId === 19 ? 'bg-blue-500/50' : 'bg-red-500/50'"
+                :class="
+                  selectedConversation.apiSourceId === 19
+                    ? 'bg-blue-500/50'
+                    : 'bg-red-500/50'
+                "
               >
                 {{ getSourceLabel(selectedConversation.apiSourceId) }}
               </span>
+
+              <!-- BADGE ARRIVAL -->
+              <span
+                class="px-2 py-0.5 text-xs rounded-full text-white bg-cyan-500/50 flex"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-3 my-0.5 mr-1"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                  />
+                </svg>
+                {{ formatDate(selectedConversation.bookingDetails.arrival) }}
+              </span>
+
+              <!-- BADGE DEPARTURE -->
+              <span
+                class="px-2 py-0.5 text-xs rounded-full text-white bg-red-500/50 flex"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-3 my-0.5 mr-1"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
+                  />
+                </svg>
+
+                {{ formatDate(selectedConversation.bookingDetails.departure) }}
+              </span>
             </div>
             <p class="text-sm text-white/50">
-              Booking ID: {{ selectedConversation.id }}
+              {{ selectedConversation.propertyDetails.name }}
             </p>
           </div>
 
@@ -101,7 +151,9 @@
               v-for="message in selectedConversation.messages"
               :key="message.id"
               class="flex"
-              :class="message.source === 'guest' ? 'justify-start' : 'justify-end'"
+              :class="
+                message.source === 'guest' ? 'justify-start' : 'justify-end'
+              "
             >
               <div
                 :class="[
@@ -112,19 +164,14 @@
                 <p class="text-white text-sm">{{ message.content }}</p>
                 <span
                   class="text-xs mt-1 block"
-                  :class="message.source === 'guest' ? 'text-white/50' : 'text-white/70'"
+                  :class="
+                    message.source === 'guest'
+                      ? 'text-white/50'
+                      : 'text-white/70'
+                  "
                 >
                   {{ message.time }}
                 </span>
-              </div>
-            </div>
-            <div v-if="isGenerating" class="flex justify-end">
-              <div class="bg-blue-500/50 rounded-lg px-3 py-2">
-                <div class="flex space-x-2">
-                  <div class="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-                  <div class="w-2 h-2 bg-white rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                  <div class="w-2 h-2 bg-white rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-                </div>
               </div>
             </div>
           </div>
@@ -137,20 +184,23 @@
                 placeholder="Type a message..."
                 class="flex-1 bg-white/5 text-white placeholder-white/50 rounded-lg px-3 py-2"
                 v-model="newMessage"
-                @keyup.enter="sendMessage"
+                @keyup.enter="handleSendMessage"
               />
               <button
-                @click="sendMessage"
-                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                :disabled="!newMessage.trim() || isGenerating"
+                @click="handleSendMessage"
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="!newMessage.trim() || isSending"
               >
-                Send
+                {{ isSending ? "Sending..." : "Send" }}
               </button>
             </div>
           </div>
         </div>
-        <div v-else class="flex-1 flex items-center justify-center text-white/50">
-          Select a conversation to start messaging
+        <div
+          v-else
+          class="flex-1 flex items-center justify-center text-white/50"
+        >
+          Select a conversation to start messaging with a guest
         </div>
       </div>
     </div>
@@ -158,35 +208,47 @@
 </template>
 
 <script setup>
-import { useMessages } from '~/composables/useMessages';
-import { useAI } from '~/composables/useAI';
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch, computed } from "vue";
+import { useMessages } from "~/composables/useMessages";
+import { useAI } from "~/composables/useAI";
 
 const {
   conversations,
+  completedConversations,
   selectedConversation,
   isLoading,
   error,
   fetchMessages,
   selectConversation,
+  sendMessage,
 } = useMessages();
 
-const { generateResponse, isGenerating } = useAI();
+const { incomingChat } = useAI();
 
-const searchQuery = ref('');
-const newMessage = ref('');
+const searchQuery = ref("");
+const newMessage = ref("");
 const messageContainer = ref(null);
+const isSending = ref(false);
 
+/**
+ * Returns a label for the given API source ID.
+ *
+ * @param {number} apiSourceId - The ID of the API source.
+ * @returns {string} A string representing the source label, such as "Direct", "Airbnb", "Expedia",
+ * "Booking.com", or "Unknown" if the ID does not match any known source.
+ */
 const getSourceLabel = (apiSourceId) => {
   switch (apiSourceId) {
+    case 0:
+      return "Direct";
+    case 10 || 46:
+      return "Airbnb";
+    case 14:
+      return "Expedia";
     case 19:
-      return 'Booking.com';
-    case 20:
-      return 'Airbnb';
-    case 21:
-      return 'Expedia';
+      return "Booking.com";
     default:
-      return 'Direct';
+      return "Unknown";
   }
 };
 
@@ -211,7 +273,8 @@ watch(
     if (selectedConversation.value) {
       nextTick(() => {
         if (messageContainer.value) {
-          messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
+          messageContainer.value.scrollTop =
+            messageContainer.value.scrollHeight;
         }
       });
     }
@@ -219,36 +282,29 @@ watch(
   { deep: true }
 );
 
-const sendMessage = async () => {
-  if (!newMessage.value.trim() || !selectedConversation.value) return;
+const capitalize = (s) => s && s[0].toUpperCase() + s.slice(1);
 
-  const messageContent = newMessage.value;
-  newMessage.value = '';
+const formatDate = (dateString) => {
+  // Split the input date string into components
+  const [year, month, day] = dateString.split("-");
 
-  // Add user message
-  selectedConversation.value.messages.push({
-    id: Date.now(),
-    content: messageContent,
-    time: new Date().toLocaleTimeString(),
-    source: 'host'
-  });
+  // Return the date in DD-MM-YYYY format
+  return `${day}-${month}-${year}`;
+};
 
-  // Generate AI response
-  const aiResponse = await generateResponse(messageContent, {
-    guest: selectedConversation.value.guest,
-    arrival: selectedConversation.value.arrival,
-    departure: selectedConversation.value.departure,
-    propertyId: selectedConversation.value.propertyId,
-    roomId: selectedConversation.value.roomId
-  });
+const handleSendMessage = async () => {
+  if (!newMessage.value.trim() || isSending.value) return;
 
-  if (aiResponse) {
-    selectedConversation.value.messages.push({
-      id: Date.now() + 1,
-      content: aiResponse,
-      time: new Date().toLocaleTimeString(),
-      source: 'host'
-    });
+  isSending.value = true;
+  try {
+    // FILTRE POUR NE MARCHER QUE SUR MA RESERVATION
+    if ((selectedConversation.value.bookingId = 63311557)) {
+      await sendMessage(newMessage.value);
+    }
+  } catch (e) {
+    // Error is already handled in useMessages
+  } finally {
+    isSending.value = false;
   }
 };
 </script>

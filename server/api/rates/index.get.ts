@@ -2,14 +2,14 @@ import { Beds24Client } from '~/lib/beds24';
 
 export default defineEventHandler(async (event) => {
   try {
-    const config = useRuntimeConfig();
-    const client = new Beds24Client({ apiKey: config.token });
+    const nuxtConfig = useRuntimeConfig();
+    const client = new Beds24Client({ token: nuxtConfig.token });
     const query = getQuery(event);
 
     if (!query.propertyId || !query.startDate || !query.endDate) {
       throw createError({
         statusCode: 400,
-        message: 'Missing required parameters: propertyId, startDate, endDate'
+        message: 'Missing required parameters: propertyId, startDate, endDate',
       });
     }
 
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     console.error('Error fetching rates:', error);
     throw createError({
       statusCode: error.response?.status || 500,
-      message: error.message || 'Failed to fetch rates'
+      message: error.message || 'Failed to fetch rates',
     });
   }
 });

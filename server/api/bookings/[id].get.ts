@@ -1,25 +1,22 @@
-import { Beds24Client } from '~/lib/beds24';
+import { Beds24Client } from "~/lib/beds24";
+import { validateBookingAccess } from "~/server/utils/auth";
 
 export default defineEventHandler(async (event) => {
   try {
-    const config = useRuntimeConfig();
-    const client = new Beds24Client({ apiKey: config.token });
-    const id = parseInt(event.context.params.id);
+    const nuxtConfig = useRuntimeConfig();
+    const client = new Beds24Client({ token: nuxtConfig.token });
+    const bookingId = event.context.params.id;
 
-    if (isNaN(id)) {
-      throw createError({
-        statusCode: 400,
-        message: 'Invalid booking ID'
-      });
-    }
+    // Validate access
+    await validateBookingAccess(event);
 
-    const response = await client.bookings.get(id);
+    const response = await client.bookings.get(bookingId);
     return response;
   } catch (error) {
-    console.error('Error fetching booking:', error);
+    console.error("Error fetching booking:", error);
     throw createError({
       statusCode: error.response?.status || 500,
-      message: error.message || 'Failed to fetch booking'
+      message: error.message || "Failed to fetch booking",
     });
   }
 });

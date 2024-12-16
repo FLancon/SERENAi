@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
+  const nuxtConfig = useRuntimeConfig();
 
   try {
     let config = {
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
       maxBodyLength: Infinity,
       url: "https://api.beds24.com/v2/bookings/messages",
       headers: {
-        token: process.env.token,
+        token: nuxtConfig.token,
       },
     };
     const response = await axios(config);

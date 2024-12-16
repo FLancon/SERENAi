@@ -41,7 +41,9 @@ export class PropertiesApi {
         case 429:
           throw new Error('Rate limit exceeded');
         default:
-          throw new Error(data.message || 'An error occurred with the properties API');
+          throw new Error(
+            data.message || 'An error occurred with the properties API'
+          );
       }
     }
     throw error;

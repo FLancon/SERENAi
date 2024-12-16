@@ -1,8 +1,13 @@
 import { AxiosInstance } from 'axios';
 import { Booking, BookingFilters, ApiResponse } from '../types';
+import { Logger } from '../utils/logger';
 
 export class BookingsApi {
-  constructor(private readonly axios: AxiosInstance) {}
+  private readonly logger: Logger;
+
+  constructor(private readonly axios: AxiosInstance) {
+    this.logger = new Logger('MessagesApi');
+  }
 
   /**
    * Retrieve a list of bookings
@@ -11,9 +16,12 @@ export class BookingsApi {
    */
   async list(filters?: BookingFilters): Promise<ApiResponse<Booking[]>> {
     try {
-      const { data } = await this.axios.get('/bookings', { params: filters });
+      this.logger.debug('Fetching bookings with filters:', filters);
+      //Arrival from 2024 retrieves all bookings
+      const { data } = await this.axios.get('/bookings?arrivalFrom=2024-01-01', { params: filters});
       return data;
     } catch (error) {
+      this.logger.error('Error fetching bookings:', error);
       throw this.handleError(error);
     }
   }
@@ -25,6 +33,7 @@ export class BookingsApi {
    */
   async get(id: number): Promise<ApiResponse<Booking>> {
     try {
+      this.logger.debug('Fetching bookings with id:', id);
       const { data } = await this.axios.get(`/bookings?id=${id}`);
       return data;
     } catch (error) {
@@ -41,7 +50,9 @@ export class BookingsApi {
         case 429:
           throw new Error('Rate limit exceeded');
         default:
-          throw new Error(data.message || 'An error occurred with the bookings API');
+          throw new Error(
+            data.message || 'An error occurred with the bookings API'
+          );
       }
     }
     throw error;

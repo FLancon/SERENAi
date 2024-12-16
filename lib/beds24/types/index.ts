@@ -1,5 +1,5 @@
 export interface Beds24Config {
-  apiKey: string;
+  token: string;
   baseURL?: string;
   version?: string;
   format?: 'json' | 'xml';
@@ -19,11 +19,28 @@ export interface PropertyFilters {
 }
 
 export interface BookingFilters extends PaginationParams {
+  id: number;
   propertyId?: number;
   status?: 'confirmed' | 'pending' | 'cancelled';
   dateFrom?: Date;
   dateTo?: Date;
   modifiedSince?: Date;
+}
+
+export interface Message {
+  id: number;
+  bookingId: number;
+  content: string;
+  sender: 'guest' | 'host';
+  createdAt: Date;
+  readAt?: Date;
+}
+
+export interface MessageFilters extends PaginationParams {
+  bookingId?: number;
+  dateFrom?: Date;
+  dateTo?: Date;
+  unreadOnly?: boolean;
 }
 
 export interface Property {

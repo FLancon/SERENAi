@@ -2,8 +2,8 @@ import { Beds24Client } from '~/lib/beds24';
 
 export default defineEventHandler(async (event) => {
   try {
-    const config = useRuntimeConfig();
-    const client = new Beds24Client({ apiKey: config.token });
+    const nuxtConfig = useRuntimeConfig();
+    const client = new Beds24Client({ token: nuxtConfig.token });
     const id = parseInt(event.context.params.id);
 
     if (isNaN(id)) {

@@ -1,5 +1,5 @@
 {
-  "name": "rental-management",
+  "name": "SERENA Ai Assistant",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,6 +12,9 @@
   "dependencies": {
     "nuxt": "^3.13.0",
     "@nuxtjs/tailwindcss": "^6.11.4",
+    "@supabase/supabase-js": "^2.39.7",
+    "@vueuse/core": "^10.9.0",
+    "@vueuse/nuxt": "^10.9.0",
     "chart.js": "^4.4.1",
     "vue-chartjs": "^5.3.0",
     "@vuepic/vue-datepicker": "^7.4.0",
@@ -19,6 +22,7 @@
     "axios": "^1.6.7",
     "openai": "^4.28.0",
     "axios-retry": "^4.0.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zxcvbn": "^4.4.2"
   }
 }

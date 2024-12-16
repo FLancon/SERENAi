@@ -1,5 +1,5 @@
-import { AxiosInstance } from "axios";
-import { ApiResponse } from "../types";
+import { AxiosInstance } from 'axios';
+import { ApiResponse } from '../types';
 
 export class SystemApi {
   constructor(private readonly axios: AxiosInstance) {}
@@ -9,7 +9,7 @@ export class SystemApi {
    */
   async getStatus(): Promise<ApiResponse<any>> {
     try {
-      const { data } = await this.axios.get("/system/status");
+      const { data } = await this.axios.get('/system/status');
       return data;
     } catch (error) {
       throw this.handleError(error);
@@ -21,14 +21,14 @@ export class SystemApi {
       const { status, data } = error.response;
       switch (status) {
         case 429:
-          throw new Error("Rate limit exceeded");
+          throw new Error('Rate limit exceeded');
         case 401:
-          throw new Error("Unauthorized");
+          throw new Error('Unauthorized');
         case 404:
-          throw new Error("Not Found");
+          throw new Error('Not Found');
         default:
           throw new Error(
-            data.message || "An error occurred with the system API"
+            data.message || 'An error occurred with the system API'
           );
       }
     }

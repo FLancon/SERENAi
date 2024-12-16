@@ -8,6 +8,7 @@ import { AvailabilityApi } from './api/availability';
 import { RatesApi } from './api/rates';
 import { ChannelsApi } from './api/channels';
 import { SystemApi } from './api/system';
+import { MessagesApi } from './api/messages';
 
 export class Beds24Client {
   private readonly config: Beds24Config;
@@ -19,6 +20,7 @@ export class Beds24Client {
   public readonly rates: RatesApi;
   public readonly channels: ChannelsApi;
   public readonly system: SystemApi;
+  public readonly messages: MessagesApi;
 
   constructor(config: Partial<Beds24Config>) {
     this.config = createConfig(config);
@@ -31,6 +33,7 @@ export class Beds24Client {
     this.rates = new RatesApi(this.axios);
     this.channels = new ChannelsApi(this.axios);
     this.system = new SystemApi(this.axios);
+    this.messages = new MessagesApi(this.axios);
   }
 
   private createAxiosInstance(): AxiosInstance {
@@ -38,8 +41,8 @@ export class Beds24Client {
       baseURL: this.config.baseURL,
       timeout: this.config.timeout,
       headers: {
-        'token': this.config.apiKey,
-        'Accept': this.config.format === 'json' ? 'application/json' : 'application/xml',
+        'token': this.config.token, // Use token header instead of Authorization
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     });
@@ -50,7 +53,7 @@ export class Beds24Client {
       retryDelay: axiosRetry.exponentialDelay,
       retryCondition: (error) => {
         return axiosRetry.isNetworkOrIdempotentRequestError(error) ||
-          error.response?.status === 429; // Rate limit exceeded
+          error.response?.status === 429;
       }
     });
 
@@ -59,9 +62,10 @@ export class Beds24Client {
       response => response,
       error => {
         if (error.response) {
-          const { status, data } = error.response;
-          if (status === 429) {
-            // Handle rate limiting
+          const { status } = error.response;
+          if (status === 401) {
+            console.error('Invalid API token');
+          } else if (status === 429) {
             const retryAfter = error.response.headers['retry-after'];
             error.retryAfter = retryAfter ? parseInt(retryAfter, 10) : 60;
           }

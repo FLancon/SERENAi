@@ -9,12 +9,14 @@ const DEFAULT_CONFIG: Beds24Config = {
 };
 
 export const createConfig = (config: Partial<Beds24Config>): Beds24Config => {
-  if (!config.apiKey) {
-    throw new Error('API key is required');
+  if (!config.token) {
+    throw new Error('Token is required');
   }
 
   return {
     ...DEFAULT_CONFIG,
-    ...config
+    ...config,
+    // Ensure token is properly set
+    token: config.token.trim()
   };
 };
